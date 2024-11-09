@@ -1,0 +1,91 @@
+import { axiosApiCall } from "../../utility/axiosHelper";
+
+const USER_EP = import.meta.env.VITE_SERVER_API + "/v1/users";
+
+// signup post
+export const signupUserAxios = (obj) => {
+  return axiosApiCall({
+    url: USER_EP + "/signup",
+    method: "POST",
+    data: obj,
+    isToast: true,
+  });
+};
+
+// verify account axios
+export const verifyAccountAxios = (obj) => {
+  return axiosApiCall({
+    url: USER_EP + "/verify-account",
+    method: "POST",
+    data: obj,
+    isToast: true,
+  });
+};
+
+// login post
+export const loginUserAxios = (obj) => {
+  return axiosApiCall({
+    url: USER_EP + "/login",
+    method: "POST",
+    data: obj,
+    isToast: true,
+  });
+};
+
+// fetch user profile get
+export const fetchUserAxios = () => {
+  return axiosApiCall({
+    url: USER_EP + "/profile",
+    method: "GET",
+    isPrivate: true,
+  });
+};
+
+// request OTP
+export const requestOTP = async (data) => {
+  return axiosApiCall({
+    url: USER_EP + "/otp",
+    method: "POST",
+    data,
+  });
+};
+
+// reset Password
+export const resetPasswordAxios = async (data) => {
+  return axiosApiCall({
+    url: USER_EP + "/password/reset",
+    method: "POST",
+    data,
+  });
+};
+
+// update profile update
+export const editProfileDetailAxios = (obj, name) => {
+  return axiosApiCall({
+    url:
+      name === "details"
+        ? USER_EP + `/update-profile`
+        : name === "profile-image"
+        ? USER_EP + "/update-image"
+        : USER_EP + "/update-password",
+    method: "PUT",
+    data: obj,
+    isPrivate: true,
+    isToast: true,
+  });
+};
+
+// renew access axios
+export const renewAccessJWTAxios = async () => {
+  const axiosObj = {
+    url: USER_EP + "/renew-access",
+    method: "GET",
+    isPrivate: true,
+    isRefresh: true,
+  };
+
+  const { accessJWT } = await axiosApiCall(axiosObj);
+  accessJWT && sessionStorage.setItem("accessJWT", accessJWT);
+
+  return accessJWT;
+};
