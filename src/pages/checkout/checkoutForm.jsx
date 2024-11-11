@@ -1,3 +1,5 @@
+/* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
 import {
   AddressElement,
   PaymentElement,
@@ -8,13 +10,16 @@ import {
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { setShippingAddress } from "../../entities/order/orderSlice";
+import { useState } from "react";
 
 const CheckoutForm = ({ clientSecret }) => {
   const stripe = useStripe();
   const elements = useElements();
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCheckout = async (e) => {
     e.preventDefault();
@@ -24,21 +29,24 @@ const CheckoutForm = ({ clientSecret }) => {
       return;
     }
 
+    setIsLoading(true);
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}`, // Replace with your confirmation page
+        return_url: `${window.location.origin}/order-confirmation`,
       },
-      redirect: "if_required", // Use "if_required" to prevent redirection if no further action is needed
+      redirect: "if_required",
     });
 
+    setIsLoading(false);
+
     if (!error) {
-      // Optionally, you can update the frontend with order confirmation details here
       dispatch(setShippingAddress(paymentIntent.shipping.address));
       navigate("/order-confirmation");
-      toast.success("Order Placed");
+      toast.success("Order Placed!");
     } else {
       console.error(error.message);
+      toast.error("Payment failed. Please try again.");
     }
   };
 
@@ -54,31 +62,35 @@ const CheckoutForm = ({ clientSecret }) => {
           </p>
           <hr className="border-gray-300 dark:border-gray-400" />
 
-          <div className="mt-8">
-            <div className="space-y-4">
-              <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
-                Shipping Address
-              </label>
-              <div className="bg-gray-50 dark:bg-gray-800 dark:border dark:border-gray-600 p-4 lg:p-12 rounded-lg">
-                <AddressElement options={{ mode: "shipping" }} />
-              </div>
+          <div className="mt-8 space-y-4">
+            <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
+              Shipping Address
+            </label>
+            <div className="bg-gray-50 dark:bg-gray-800 dark:border dark:border-gray-600 p-4 lg:p-12 rounded-lg">
+              <AddressElement options={{ mode: "shipping" }} />
             </div>
-            <div className="mt-10 space-y-4">
-              <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
-                Payment
-              </label>
-              <div className="bg-gray-50 dark:bg-gray-800 dark:border dark:border-gray-600 p-4 lg:p-12 rounded-lg">
-                <PaymentElement options={{ layout: "tabs" }} />
-              </div>
+          </div>
+
+          <div className="mt-10 space-y-4">
+            <label className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-100">
+              Payment
+            </label>
+            <div className="bg-gray-50 dark:bg-gray-800 dark:border dark:border-gray-600 p-4 lg:p-12 rounded-lg">
+              <PaymentElement options={{ layout: "tabs" }} />
             </div>
           </div>
         </div>
+
         <div className="mt-10 grid">
           <button
             type="submit"
-            className="rounded-md bg-purple-600 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600"
+            disabled={isLoading}
+            aria-busy={isLoading}
+            className={`rounded-md bg-purple-600 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-purple-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-600 ${
+              isLoading ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           >
-            Pay and Order
+            {isLoading ? "Processing..." : "Pay and Order"}
           </button>
         </div>
       </form>

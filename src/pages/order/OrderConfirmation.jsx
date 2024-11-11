@@ -8,7 +8,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-
 import { Link } from "react-router-dom";
 import { setOrderIdInStore } from "../../entities/order/orderSlice";
 import { emptyCart } from "../../entities/cart/cartSlice";
@@ -22,7 +21,6 @@ const OrderConfirmation = () => {
   const options = { month: "long", day: "numeric" };
   const date = new Date();
   const day7 = new Date(date);
-
   day7.setDate(day7.getDate() + 7);
 
   const fromDate = date.toLocaleDateString("en-US", options);
@@ -43,7 +41,7 @@ const OrderConfirmation = () => {
         <Link
           to={"/login"}
           state={location.pathname}
-          className="py-2 px-16 bg-purple-600 text-white rounded-md shadow-lg"
+          className="py-2 px-16 bg-indigo-600 text-white rounded-full shadow-lg hover:bg-indigo-700 transition"
         >
           Login To Checkout
         </Link>
@@ -54,10 +52,13 @@ const OrderConfirmation = () => {
   if (currentCart?.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-gray-500">
           Your cart is empty.{" "}
-          <Link to="/products" className="text-purple-600">
-            Shop now.
+          <Link
+            to="/products"
+            className="text-indigo-600 font-semibold underline"
+          >
+            Shop now
           </Link>
         </p>
       </div>
@@ -65,142 +66,132 @@ const OrderConfirmation = () => {
   }
 
   return (
-    <div className="">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 my-8">
-        <div className="flex justify-center flex-col items-center">
-          <h1 className="font-bold text-2xl mb-4">
+    <div className="bg-gray-50 min-h-screen py-10">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 my-8">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
             Thank you for your order, {user?.firstName}!
           </h1>
-          <p className="font-sm">
-            Your Order <span className="font-bold">{orderId}</span> is in works.
-            We sent you an email to{" "}
-            <span className="font-bold">{user?.email}</span> with your{" "}
-            <span className="">order receipt</span>.
+          <p className="text-lg text-gray-600">
+            Your Order{" "}
+            <span className="font-bold text-gray-800">{orderId}</span> is being
+            processed. We have sent a receipt to{" "}
+            <span className="font-semibold text-gray-800">{user?.email}</span>.
           </p>
-          <CheckCircleIcon className="w-24 h-24 rounded-full text-green-500 object-cover object-center my-6" />
+          <CheckCircleIcon className="w-20 h-20 text-green-500 my-6" />
         </div>
 
-        <div className="flex justify-end max-w-3xl mx-auto mb-2">
-          <Link to={"/my-orders"} className="px-6 py-1 bg-teal-600 rounded-md">
-            Previous Orders...
+        <div className="flex justify-center mt-6">
+          <Link
+            to={"/my-orders"}
+            className="text-indigo-600 font-medium hover:underline"
+          >
+            View Previous Orders
           </Link>
         </div>
+
         {/* Order Summary */}
-        <div className="border border-gray-500 rounded-md pb-20 flex justify-center flex-col max-w-3xl mx-auto">
-          <div className="bg-gray-800 text-white py-4 rounded-t px-4 text-end">
-            <span>
+        <div className="border rounded-lg shadow-lg overflow-hidden mt-8 max-w-3xl mx-auto">
+          <div className="bg-indigo-700 text-white py-4 px-6 text-right">
+            <span className="text-lg font-semibold">
               Total: $
-              {currentCart?.reduce(
-                (acc, curr) =>
-                  acc + curr?.quantity * (curr?.salesPrice ?? curr?.price),
-                0
-              )}
+              {currentCart
+                .reduce(
+                  (acc, curr) =>
+                    acc + curr.quantity * (curr.salesPrice ?? curr.price),
+                  0
+                )
+                .toFixed(2)}
             </span>
           </div>
 
-          <div className="px-2 sm:px-4 md:px:8 lg:px-10">
-            <div className="">
-              <ul className="mt-4">
-                {currentCart?.map((product) => (
-                  <li
-                    key={product?._id}
-                    className="border-b border-gray-300 dark:border-gray-400 pb-4 mb-4"
-                  >
-                    <div className="flex items-end justify-between">
-                      <div className="flex items-center">
-                        <Link to={`/product/${product?._id}`}>
-                          <img
-                            src={product?.thumbnail}
-                            alt={product?.name}
-                            className="h-32 w-32 object-cover rounded-md mr-4"
-                          />
-                        </Link>
-                        <div className="space-y-2">
-                          <h3 className="font-semibold dark:text-gray-100">
-                            {product?.name}
-                          </h3>
-
-                          <div className="space-y-1 text-sm">
-                            <p className="text-gray-600 dark:text-gray-400">
-                              Quantity: {product?.quantity}
-                            </p>
-                            <p className="text-gray-600 dark:text-gray-400">
-                              Amount: $
-                              {(product?.salesPrice || product?.price) *
-                                product?.quantity || 0}
-                            </p>
-                          </div>
-                          <button className="px-4 py-2 rounded-md bg-teal-600 hover:bg-teal-500 text-white text-sm font-semibold">
-                            Buy Again
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 px-10 gap-10 md:space-y-0 mx-auto mt-20">
-              <div className="space-y-8">
-                <div className="flex gap-2">
-                  <CalendarDateRangeIcon className="h-7 w-7" />
-                  <div className="space-y-2">
-                    <h1 className="text-lg font-bold">Estimeted Arrival</h1>
-                    <h2 className="text-sm font-semibold">
-                      {fromDate} - {toDate}
-                    </h2>
-                    <p className="text-sm text-gray-700 dark:text-gray-400">
-                      To ensure prompt delivery some items may be shipped
-                      seperately
+          <div className="p-6 space-y-8">
+            <ul className="space-y-6">
+              {currentCart.map((product) => (
+                <li key={product._id} className="flex items-start space-x-4">
+                  <Link to={`/product/${product._id}`}>
+                    <img
+                      src={product.thumbnail}
+                      alt={product.name}
+                      className="h-24 w-24 object-cover rounded-lg"
+                    />
+                  </Link>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      Quantity: {product.quantity}
                     </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <MapPinIcon className="h-7 w-7" />
-                  <div className="space-y-2">
-                    <h1 className="text-lg font-bold">Shipping To</h1>
-                    <div className="">
-                      <p className="text-sm font-semibold">
-                        {shippingAddress?.line1}
-                      </p>
-                      <p className="text-sm font-semibold">
-                        {shippingAddress?.city} {shippingAddress?.postal_code}
-                      </p>
-                      <p className="text-sm font-semibold">
-                        {shippingAddress?.state}
-                      </p>
-                    </div>
-                    <p className="text-sm text-gray-700 dark:text-gray-400">
-                      Tracking information will be available once your order is
-                      ships
+                    <p className="text-sm text-gray-500">
+                      Amount: $
+                      {(
+                        (product.salesPrice || product.price) * product.quantity
+                      ).toFixed(2)}
                     </p>
+                    <button className="mt-2 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-full hover:bg-indigo-500 transition">
+                      Buy Again
+                    </button>
                   </div>
-                </div>
-              </div>
+                </li>
+              ))}
+            </ul>
 
-              <div className="flex flex-end gap-2 text-sm">
-                <QuestionMarkCircleIcon className="h-7 w-7" />
-                <div className="space-y-2">
-                  <h1 className="text-lg font-bold">Have a Question?</h1>
-                  <div className="grid grid-cols-1 border rounded-md">
-                    <div className="flex gap-4 ps-3 py-2">
-                      <PhoneIcon className="w-5 h-5" />
-                      <p>(02) 9876 5432</p>
-                    </div>
-                    <div className="flex gap-4 ps-3 py-2 border-t">
-                      <AtSymbolIcon className="w-5 h-5" />
-                      <p>support@vikiamy.com</p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-400 pt-4">
-                    Need to return something? Print or show this image in store
-                    to use as a receipt.{" "}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-10">
+              {/* Estimated Arrival */}
+              <div className="flex gap-3">
+                <CalendarDateRangeIcon className="h-7 w-7 text-indigo-700" />
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Estimated Arrival
+                  </h2>
+                  <p className="text-gray-500">
+                    {fromDate} - {toDate}
                   </p>
                 </div>
               </div>
+
+              {/* Shipping Address */}
+              <div className="flex gap-3">
+                <MapPinIcon className="h-7 w-7 text-indigo-700" />
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Shipping Address
+                  </h2>
+                  <p className="text-gray-500">{shippingAddress?.line1}</p>
+                  <p className="text-gray-500">
+                    {shippingAddress?.city} {shippingAddress?.postal_code}
+                  </p>
+                  <p className="text-gray-500">{shippingAddress?.state}</p>
+                </div>
+              </div>
             </div>
+          </div>
+
+          {/* Customer Support */}
+          <div className="bg-gray-100 p-6">
+            <div className="flex items-start gap-3">
+              <QuestionMarkCircleIcon className="h-7 w-7 text-indigo-700" />
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Have a Question?
+                </h2>
+                <div className="mt-4 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <PhoneIcon className="h-5 w-5 text-gray-700" />
+                    <p className="text-gray-700">(02) 9876 5432</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <AtSymbolIcon className="h-5 w-5 text-gray-700" />
+                    <p className="text-gray-700">support@vikiamy.com</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p className="mt-4 text-sm text-gray-600">
+              Need to return an item? Present this receipt in-store or contact
+              our support team.
+            </p>
           </div>
         </div>
       </div>

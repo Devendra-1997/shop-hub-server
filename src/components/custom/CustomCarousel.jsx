@@ -43,7 +43,7 @@ const CustomCarousel = ({ images = [] }) => {
             <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-40"></div>
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center text-white">
               <h1 className="text-3xl lg:text-4xl font-semibold tracking-wide mb-4">
-                PREMIUM & LUXURY WATCHES
+                PREMIUM & LUXURY CARS
               </h1>
               <Link to="/products" className="inline-block">
                 <button className="px-6 py-3 border-2 border-white rounded-full text-white font-medium tracking-widest hover:bg-white hover:text-black transition-all duration-300">

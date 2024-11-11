@@ -7,7 +7,7 @@ import { RequestOTP } from "../../components/password-reset/RequestOTP";
 import { ResetPassword } from "../../components/password-reset/ResetPassword";
 import bg_url from "../../assets/images/audi.avif";
 
-export const ForgetPassword = () => {
+const ForgetPassword = () => {
   const [showForm, setShowForm] = useState("otp");
   const [response, setResponse] = useState({});
   const [email, setEmail] = useState("");
@@ -103,3 +103,5 @@ export const ForgetPassword = () => {
     </div>
   );
 };
+
+export default ForgetPassword;
